@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  password  String
+  role      Role      @default(CUSTOMER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bookings  Booking[]
+  venues    Venue[]   // Owner memiliki banyak venue
+}
+
+model Venue {
+  id          String    @id @default(cuid())
+  name        String
+  address     String
+  description String?   // deskripsi venue, opsional
+  imageUrls   String[]
+  owner       User      @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  fields      Field[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Field {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  type        String     // contoh: "Futsal", "Basket", dll
+  surface     String?    // contoh: "Akrilik", "Rumput", dll
+  imageUrls   String[]   // array of image URL
+  venue       Venue      @relation(fields: [venueId], references: [id])
+  venueId     String
+  timeSlots   TimeSlot[]
+  specialTimeSlots SpecialTimeSlot[] // Relasi ke SpecialTimeSlot
+  bookings    Booking[]
+}
+
+model TimeSlot {
+  id        String   @id @default(cuid())
+  field     Field    @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  fieldId   String
+  day       DayOfWeek // enum: MONDAY, TUESDAY, etc.
+  startTime String   // contoh: "10:00"
+  endTime   String   // contoh: "11:00"
+  price     Int
+  bookings  Booking[]
+}
+
+model SpecialTimeSlot {
+  id        String   @id @default(cuid())
+  field     Field    @relation(fields: [fieldId], references: [id])
+  fieldId   String
+  date      DateTime // tanggal spesifik
+  startTime String
+  endTime   String
+  price     Int
+}
+
+model Booking {
+  id           String         @id @default(cuid())
+  user         User?          @relation(fields: [userId], references: [id])
+  userId       String?
+  guestName    String?
+  guestEmail   String?
+  guestPhone   String?
+  field        Field          @relation(fields: [fieldId], references: [id])
+  fieldId      String
+  timeSlot     TimeSlot?       @relation(fields: [timeSlotId], references: [id], onDelete: SetNull)
+  timeSlotId   String?
+  date         DateTime
+  status       BookingStatus  @default(PENDING)
+  totalPrice   Int
+  orderId    String?
+  paidAt       DateTime?
+  snapToken    String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model VerificationCode {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  createdAt DateTime @default(now())
+  expiresAt DateTime // Waktu kadaluarsa (10 menit setelah createdAt)
+  isUsed    Boolean  @default(false)
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  PAID
+  CANCELLED
+  DRAFT
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
