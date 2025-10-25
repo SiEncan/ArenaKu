@@ -25,7 +25,8 @@ export default function Navbar() {
             <Link href="/" className="text-gray-700 hover:text-green-600 font-medium">Beranda</Link>
             <Link href="/cari-venue" className="text-gray-700 hover:text-green-600 font-medium">Venue</Link>
             <a href="#" className="text-gray-700 hover:text-green-600 font-medium">Cara Booking</a>
-            <a href="#" className="text-gray-700 hover:text-green-600 font-medium">Tentang Kami</a>
+            <Link href="/tentang-kami" className="text-gray-700 hover:text-green-600 font-medium">Tentang Kami</Link>
+
           </div>
 
           {/* Auth buttons (desktop) */}

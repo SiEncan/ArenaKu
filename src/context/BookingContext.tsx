@@ -1,39 +1,47 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+// BookingContext.tsx
+import { createContext, useContext, useState, useEffect } from "react";
 
 interface BookingContextType {
   draftBookingId: string | null;
-  setDraftBookingId: (id: string | null) => void;
+  setDraftBookingId: (id: string) => void;
   clearDraftBookingId: () => void;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
-export const BookingProvider = ({ children }: { children: ReactNode }) => {
-  // Inisialisasi draftBookingId dari localStorage
-  const [draftBookingId, setDraftBookingId] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("draftBookingId") || null;
-    }
-    return null;
-  });
+export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [draftBookingId, setDraftBookingIdState] = useState<string | null>(null);
 
-  // Simpan draftBookingId ke localStorage setiap kali berubah
   useEffect(() => {
-    if (draftBookingId) {
-      localStorage.setItem("draftBookingId", draftBookingId);
-    } else {
-      localStorage.removeItem("draftBookingId");
+    // Ambil draftBookingId dan createdAt dari localStorage saat aplikasi dimuat
+    const storedBooking = localStorage.getItem("draftBooking");
+    if (storedBooking) {
+      const { id, createdAt } = JSON.parse(storedBooking);
+      const now = Date.now();
+      const expirationTime = 24 * 60 * 60 * 1000; // 24 jam dalam milidetik
+
+      // Jika draftBookingId sudah kadaluarsa, hapus
+      if (now - createdAt > expirationTime) {
+        localStorage.removeItem("draftBooking");
+      } else {
+        setDraftBookingIdState(id);
+      }
     }
-  }, [draftBookingId]);
+  }, []);
+
+  const setDraftBookingId = (id: string) => {
+    setDraftBookingIdState(id);
+    // Simpan draftBookingId beserta timestamp
+    localStorage.setItem("draftBooking", JSON.stringify({ id, createdAt: Date.now() }));
+  };
 
   const clearDraftBookingId = () => {
-    setDraftBookingId(null);
+    setDraftBookingIdState(null);
+    localStorage.removeItem("draftBooking");
   };
 
   return (
-    <BookingContext.Provider
-      value={{ draftBookingId, setDraftBookingId, clearDraftBookingId }}
-    >
+    <BookingContext.Provider value={{ draftBookingId, setDraftBookingId, clearDraftBookingId }}>
       {children}
     </BookingContext.Provider>
   );

@@ -19,6 +19,20 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+  interface BookingData {
+    id: string;
+    fieldId: string;
+    totalPrice: number;
+    field: {
+      venue: {
+        name: string;
+      };
+      name: string;
+    };
+    timeSlotId: string;
+    date: string;
+  }
+
 const CheckoutPage = () => {
   const router = useRouter();
 
@@ -30,6 +44,7 @@ const CheckoutPage = () => {
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [bookingData, setBookingData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showPendingDialog, setShowPendingDialog] = useState(false);
@@ -81,8 +96,10 @@ const CheckoutPage = () => {
         const res = await fetch(`/api/bookings/${draftBookingId}`);
         const result = await res.json();
 
-        if(!draftBookingId) {
-          setErrorModal("Tidak ada booking yang aktif. Silakan buat booking baru.");
+        if (!draftBookingId) {
+          setErrorModal(
+            "Tidak ada booking yang aktif. Silakan buat booking baru."
+          );
           return;
         }
 
@@ -167,7 +184,7 @@ const CheckoutPage = () => {
       setResendCount(0);
       setFirstResendTime(null);
     }
-  }, [firstResendTime, resendCount]);
+  }, [firstResendTime, resendCount, RESEND_WINDOW]);
 
   const handleDeleteBookingAndBack = async () => {
     setShowDeleteConfirmationDialog(false);
@@ -257,7 +274,7 @@ const CheckoutPage = () => {
       const result = await res.json();
 
       if (result.success && result.booking) {
-        setPendingBookingId(result.booking.id)
+        setPendingBookingId(result.booking.id);
         setGlobalOrderId(result.booking.orderId);
         setSnapTokenButton(result.booking.snapToken);
         setDisplayContinuePayment(true);
@@ -419,6 +436,8 @@ const CheckoutPage = () => {
       return;
     }
 
+    console.log("hai");
+
     if (lastSentTime) {
       const timeElapsed = Date.now() - lastSentTime;
       const oneMinuteInMs = 60 * 1000;
@@ -450,7 +469,7 @@ const CheckoutPage = () => {
     setShowResendVerificationModal(true);
   };
 
-  const createBookingWithData = async (bookingData: any) => {    
+  const createBookingWithData = async (bookingData: BookingData) => {
     setLoading(true);
     let snapToken = "";
     let orderId = "";
@@ -536,9 +555,13 @@ const CheckoutPage = () => {
       }
 
       handlePayment(snapToken, orderId);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting form:", error);
-      alert("Terjadi kesalahan saat membuat booking: " + error.message);
+      if (error instanceof Error) {
+        alert("Terjadi kesalahan saat membuat booking: " + error.message);
+      } else {
+        alert("Terjadi kesalahan saat membuat booking.");
+      }
     } finally {
       setLoading(false);
     }
@@ -576,7 +599,7 @@ const CheckoutPage = () => {
           });
           router.push(`/payment/status/${orderId}`);
         },
-        onError: function (res: any) {
+        onError: function (res: Error) {
           console.error("Payment Error:", res);
         },
         onClose: function () {
@@ -619,7 +642,7 @@ const CheckoutPage = () => {
             });
             router.push(`/payment/status/${globalOrderId}`);
           },
-          onError: function (res) {
+          onError: function (res: Error) {
             console.log("Payment Error:", res);
           },
           onClose: function () {
@@ -1216,6 +1239,30 @@ const CheckoutPage = () => {
                           ></path>
                         </svg>
                         Memverifikasi...
+                      </div>
+                    ) : isSendingVerification ? (
+                      <div className="flex items-center">
+                        <svg
+                          className="animate-spin h-5 w-5 text-white mr-2"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Sending verification code...
                       </div>
                     ) : (
                       "Verifikasi"

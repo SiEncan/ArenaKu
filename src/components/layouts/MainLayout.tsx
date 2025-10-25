@@ -19,10 +19,34 @@ type LayoutProps = {
 };
 
 export default function MainLayout({ children }: LayoutProps) {
-  const { draftBookingId } = useBooking();
+  const { draftBookingId, clearDraftBookingId } = useBooking();
   const [hasBooking, setHasBooking] = useState(false);
   const [isBannerHidden, setIsBannerHidden] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const checkBookingStatus = async () => {
+      if (!draftBookingId) return;
+      
+      try {
+        const res = await fetch(`/api/bookings/${draftBookingId}`);
+        const result = await res.json();
+
+        if (result.success) {
+          if (result.data.status === "PAID" || result.data.status === "CANCELLED") {
+            clearDraftBookingId();
+          }
+        } else {
+          clearDraftBookingId(); // Jika booking tidak ditemukan, hapus draftBookingId
+        }
+      } catch (error) {
+        console.error("Error checking booking status:", error);
+        clearDraftBookingId(); // Jika ada error, hapus draftBookingId untuk keamanan
+      }
+    };
+
+    checkBookingStatus();
+  }, [draftBookingId, clearDraftBookingId]);
 
   // Daftar halaman di mana banner TIDAK boleh ditampilkan
   const hideBannerOnPages = ["/checkout", "/payment/status"];

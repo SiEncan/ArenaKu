@@ -10,7 +10,7 @@ export default async function handler(
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { name, email, phone, password, role } = req.body;
+  const { name, email, phone, password } = req.body;
 
   // Validasi input
   if (!name || !email || !password) {
@@ -37,7 +37,7 @@ export default async function handler(
         email,
         phone: phone || null,
         password: hashedPassword,
-        role: role || 'CUSTOMER',
+        role: 'CUSTOMER',
       },
     });
 

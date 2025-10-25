@@ -14,7 +14,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -102,10 +103,10 @@ export default function ProfilePage() {
                   <div className="relative">
                     <Avatar className="h-24 w-24 border-4 border-green-100">
                       {userImage ? (
-                        <AvatarImage
+                        <Image
                           src={userImage}
                           alt={userName}
-                          className="object-cover w-full h-full"
+                          fill
                         />
                       ) : (
                         <AvatarFallback className="bg-green-100 text-green-700">
