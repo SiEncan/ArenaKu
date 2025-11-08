@@ -24,9 +24,11 @@ The main goal of this project is to **learn and apply modern web development pra
 - 📅 Dynamic time slot management with real-time updates  
 - 💳 Payment integration using **Midtrans**  
 - 🧾 Admin dashboard for managing venues and schedules  
-- 🧍 Role-based authentication for owners and customers  
-- 🧱 PostgreSQL + Prisma schema design ready for multi-owner expansion  
-- 🎨 Clean and responsive UI built with Tailwind CSS  
+- 🧍 Role-based authentication for owners and customers
+- 👥 Multi-owner support – Multiple owners can manage their own fields independently.
+- 📧 Email verification – Integrated Nodemailer to verify user accounts and reduce spam bookings.  
+- 🔑 Google Sign-In – Enabled seamless login without manual registration for a smoother user experience.
+- 💾 Local storage booking persistence – Preserves ongoing bookings even after page reloads or interruptions, improving user experience.  
 
 ---
 
@@ -48,7 +50,7 @@ This project was created primarily for **learning purposes**, focusing on:
 - Writing strongly typed code with **TypeScript**
 - Building responsive UIs with **Tailwind CSS**
 - Implementing a **PostgreSQL + Prisma** database
-- Preparing for **Midtrans payment gateway** integration
+- Learning how to **integrate a payment gateway** (e.g., Midtrans) into a real-world application
 - Practicing clean and modular code architecture  
 
 ---
