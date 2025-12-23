@@ -5,7 +5,7 @@ This project was developed as a **personal learning project** to explore full-st
 
 ![Preview](public/preview_arenaku.png)
 For full documentation including images and videos, you can visit my portfolio:  
-[Click Me!](https://portfolio-adnanalvito.vercel.app/projects/1)
+[Click Me!](https://adnanalvito.vercel.app/projects/1)
 
 ---
 
